@@ -2,13 +2,13 @@
 
 ###Find the name of the evil
 
-VT-Tool offers a convenient way of determining the likely name of malware by querying VirusTotal? using the file’s hash via the command line. 
+VT-Tool offers a convenient way of determining the likely name of malware by querying VirusTotal using the file’s hash via the command line. 
 
 ![vtTool](https://raw.githubusercontent.com/robbyFux/Tools/master/doc/vtTool.png)
 
 ##Introduction
 
-Source file can be found here: https://code.google.com/p/malware-crawler/source/browse/MalwareCrawler/src/tools/vtTool.py
+Source file can be found here: https://raw.githubusercontent.com/robbyFux/Tools/master/src/vtTool.py
 
 ##Requirements
 
@@ -30,9 +30,13 @@ Lexical clustering requires the following dependencies:
 ##Install on Ubuntu:
 
 `sudo apt-get -y install python-numpy python-scipy python-levenshtein`
+
 `sudo pip install requests fuzzywuzzy scikit-learn`
+
 `wget https://malware-crawler.googlecode.com/svn/MalwareCrawler/src/tools/vtTool.py`
+
 `chmod a+xr vtTool.py`
+
 `sudo mv vtTool.py /usr/local/bin`
 
 ##Usage
