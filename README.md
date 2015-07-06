@@ -1,8 +1,7 @@
 # Tools
-Tools
 
 ## vtTool
-###Find the name of the evil
+***Find the name of the evil***
 
 VT-Tool offers a convenient way of determining the likely name of malware by querying VirusTotal using the file’s hash via the command line. 
 
