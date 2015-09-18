@@ -1,0 +1,9 @@
+[Core]
+Name = malc0de
+Module = malc0de
+
+[Documentation]
+Author = Robby Zeitfuchs
+Version = 0.1
+Website = http://malc0de.com/
+Description = Download Sample from malc0de Repo
