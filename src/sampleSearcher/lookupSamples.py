@@ -66,10 +66,10 @@ def processHashVT(malware_hash):
 
     return sha256,sha1,md5
 
-def AddPlugin(cClass):
-    plugins.append(cClass)
+def AddPlugin(pluginClass):
+    plugins.append(pluginClass)
 
-def LoadPlugins():
+def loadPlugins():
     pluginPath = os.path.join(os.path.dirname(sys.argv[0]), PLUGIN_DIR)
     dirList = os.listdir(pluginPath)
     
@@ -82,12 +82,12 @@ def LoadPlugins():
             print('Error %s loading plugin: %s' % (e, plugin.replace('.py', '')))
             
 def process(sha256, sha1, md5):   
-    for cPlugin in plugins:
-        oPlugin = cPlugin()
-        oPlugin.searchSample(sha256, sha1, md5)
+    for pluginClass in plugins:
+        pluginObj = pluginClass()
+        pluginObj.searchSample(sha256, sha1, md5)
         
-        if oPlugin.isDownloadable():
-            oPlugin.downloadSample("downloadPfad")
+        if pluginObj.isDownloadable():
+            pluginObj.downloadSample("downloadPfad")
 
 if __name__ == "__main__":
     global plugins
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     f.close()
     
     # Plugins vom plugin directory laden
-    LoadPlugins()
+    loadPlugins()
         
     for malware_hash in hashes:
         sha256,sha1,md5 = processHashVT(malware_hash)
