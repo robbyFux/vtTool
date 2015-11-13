@@ -218,10 +218,11 @@ def processHash(malware_hash):
     #print "start_time=%s, wait_time=%d, counter=%d" % (str(processHash.start_time), wait_time,processHash.counter)
 
     if processHash.counter == 4 and waitTime > 0:
-        waitTime = 60
+        waitTime + 5 # Sicherheitsaufschlag
         print "Warn: Limit requests per minute reached (%d per minute); waiting %d seconds" % (processHash.counter, waitTime)
         time.sleep(waitTime)
-
+        waitTime = 60
+        
         # Reset static vars
         processHash.counter = 0
         processHash.startTime = 0
