@@ -1,6 +1,9 @@
-from yapsy.IPlugin import IPlugin
+__description__ = 'Download Sample from malc0de Repo http://malc0de.com/'
+__author__ = 'Robby Zeitfuchs'
+__version__ = '0.0.1'
+__date__ = '2015/11/13'
 
-class Malc0de(IPlugin):
+class Malc0de():
 
     downloadURLs = []
     
@@ -34,3 +37,5 @@ class Malc0de(IPlugin):
             return self.downloadURLs
         else:
             raise Exception("Keine Download-URL vorhanden!") 
+        
+AddPlugin(Malc0de)
