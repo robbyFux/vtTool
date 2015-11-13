@@ -1,7 +1,70 @@
 import os
 import sys
+import time
+import logging
 
+logging.captureWarnings(True)
 PLUGIN_DIR = 'searchmodule'
+
+try:
+    import requests
+except ImportError:
+    sys.stderr.write('Requests ist erforderlich: http://docs.python-requests.org oder sudo pip install requests')
+    sys.exit() 
+
+VIRUSTOTAL_URL = 'https://www.virustotal.com/vtapi/v2/file/report'
+VIRUSTOTAL_URL_SUBMIT = 'https://www.virustotal.com/vtapi/v2/file/scan'
+VIRUSTOTAL_API_KEY = 'a0283a2c3d55728300d064874239b5346fb991317e8449fe43c902879d758088'
+
+# Static variable decorator for function
+def staticVTCounterVar(varname, value):
+    def decorate(func):
+        setattr(func, varname, value)
+        return func
+    return decorate
+
+# Gibt ein Triple zurueck: [sha256,sha1,md5]
+@staticVTCounterVar("counter", 0)
+@staticVTCounterVar("startTime", 0)
+def processHashVT(malware_hash):
+    data = {'resource' : malware_hash, 'apikey' : VIRUSTOTAL_API_KEY}
+    md5 = ""
+    sha1 = ""
+    sha256 = ""
+    
+    # Set on first request
+    if processHashVT.startTime == 0:
+        processHashVT.startTime = time.time()
+
+    # Increment every request
+    processHashVT.counter += 1
+
+    try:
+        response = requests.post(VIRUSTOTAL_URL, data=data)
+        virustotal = response.json()
+    except Exception as e:
+        print "Error: Failed performing request: %s"% e
+        return
+    
+    # Create [sha256, sha1, md5] Hash-List
+    if 'response_code' in virustotal and int(virustotal.get('response_code')) > 0:
+        sha256 = virustotal.get('sha256')
+        sha1 = virustotal.get('sha1')
+        md5 = virustotal.get('md5')
+        
+    # Determine minimum time we need to wait for limit to reset
+    waitTime = 59 - int(time.time() - processHashVT.startTime)
+
+    if processHashVT.counter == 4 and waitTime > 0:
+        waitTime + 5 # Sicherheitsaufschlag
+        print "Warn: Limit requests per minute reached (%d per minute); waiting %d seconds" % (processHashVT.counter, waitTime)
+        time.sleep(waitTime)
+        waitTime = 60
+        # Reset static vars
+        processHashVT.counter = 0
+        processHashVT.startTime = 0
+
+    return sha256,sha1,md5
 
 def AddPlugin(cClass):
     plugins.append(cClass)
@@ -18,11 +81,10 @@ def LoadPlugins():
         except Exception as e:
             print('Error %s loading plugin: %s' % (e, plugin.replace('.py', '')))
             
-def process(hashes):   
-    # Loop round the plugins and print their names.
+def process(sha256, sha1, md5):   
     for cPlugin in plugins:
         oPlugin = cPlugin()
-        oPlugin.searchSample(hashes)
+        oPlugin.searchSample(sha256, sha1, md5)
         
         if oPlugin.isDownloadable():
             oPlugin.downloadSample("downloadPfad")
@@ -30,10 +92,32 @@ def process(hashes):
 if __name__ == "__main__":
     global plugins
     plugins = []
-    # Load the plugins from the plugin directory.
+    
+    if (len(sys.argv) != 2):
+        print "Usage: ",__file__," Hashlist(1 column)"
+        sys.exit()
+        
+    hashlist = sys.argv[1]
+    
+    if not os.path.isfile(hashlist):
+        print "File %s does not exist!" % (hashlist)
+        sys.exit()
+    
+    if not hashlist[-4] == '.':
+        print "Filename rejected. Needs file extension like .txt, .csv, or ..."
+        sys.exit()
+    
+    # Hashes einlesen
+    f = open(hashlist,'rb')
+    hashes = [x.strip() for x in f.readlines()]
+    f.close()
+    
+    # Plugins vom plugin directory laden
     LoadPlugins()
         
-    hashes = ("eed9c961d4bc5e0f7a59799950e1367ead2d2e312a87650c4613fb97d5ebe806", "be62f4a09574bbffd2808d449919a316473a3ce0", "0fe568b70a6e0044a1e315c11f8158d1")
-    process(hashes)
+    for malware_hash in hashes:
+        sha256,sha1,md5 = processHashVT(malware_hash)
+        if (sha256 and sha1 and md5):
+            process(sha256, sha1, md5)
     
     

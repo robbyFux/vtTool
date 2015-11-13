@@ -8,13 +8,11 @@ class Malc0de():
     downloadURLs = []
     
     # Benoetigt ein Triple: [sha256,sha1,md5]
-    def searchSample(self, hashes):
-        sha256,sha1,md5 = hashes
-        print "Search for Sample: %s; %s; %s" % (sha256,sha1,md5)
-        
-        self.downloadURLs.append("xz.q58723.com/xz/setup_962_1565.exe")
-        self.downloadURLs.append("xz.q58723.com/xz/setup_962_1565.exe")
-        self.downloadURLs.append("xz.q58723.com/xz/setup_962_10043.exe")
+    def searchSample(self, sha256, sha1, md5):
+        print "Malc0de search for Sample: %s; %s; %s" % (sha256,sha1,md5)
+        #self.downloadURLs.append("xz.q58723.com/xz/setup_962_1565.exe")
+        #self.downloadURLs.append("xz.q58723.com/xz/setup_962_1565.exe")
+        #self.downloadURLs.append("xz.q58723.com/xz/setup_962_10043.exe")
         return True
         
     def isDownloadable(self):

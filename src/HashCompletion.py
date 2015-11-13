@@ -26,12 +26,12 @@
 # Csv-Datei (Separator: ';'):
 # Spalten:
 # Sha256; Sha1; Md5
-# 
+#
+# Versionen
+# 13.11.2015: Fehler Limit requests per minute behoben
 #----------------------------------------------------------------------------------------------------------------------
 import os,sys
-import csv
 import time
-import base64
 import logging
 logging.captureWarnings(True)
 
@@ -86,10 +86,10 @@ def processHashVT(malware_hash):
     waitTime = 59 - int(time.time() - processHashVT.startTime)
 
     if processHashVT.counter == 4 and waitTime > 0:
-        waitTime = 60
+        waitTime + 5 # Sicherheitsaufschlag
         print "Warn: Limit requests per minute reached (%d per minute); waiting %d seconds" % (processHashVT.counter, waitTime)
         time.sleep(waitTime)
-
+        waitTime = 60
         # Reset static vars
         processHashVT.counter = 0
         processHashVT.startTime = 0
