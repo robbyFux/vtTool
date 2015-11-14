@@ -5,6 +5,10 @@ import logging
 
 logging.captureWarnings(True)
 PLUGIN_DIR = 'searchmodule'
+SAMPLES_DIR = 'samples'
+LOGFILE = 'logfile.log'
+LOG_DOWNLOAD = "DOWNLOAD\t%s\t%s"
+LOG_DOWNLOAD_URL = "URL\t%s\t%s"
 
 try:
     import requests
@@ -66,6 +70,11 @@ def processHashVT(malware_hash):
 
     return sha256,sha1,md5
 
+def log(msg):
+    logfile = os.path.join(os.path.dirname(sys.argv[0]), LOGFILE)
+    with open(logfile, 'a') as f:
+        f.write("%s\t%s\n" % (time.strftime("%d.%m.%Y %H:%M:%S"), msg))
+
 def AddPlugin(pluginClass):
     plugins.append(pluginClass)
 
@@ -87,7 +96,10 @@ def process(sha256, sha1, md5):
         pluginObj.searchSample(sha256, sha1, md5)
         
         if pluginObj.isDownloadable():
-            pluginObj.downloadSample("downloadPfad")
+            if pluginObj.downloadSample(SAMPLES_DIR):
+                log(LOG_DOWNLOAD % (sha256, pluginObj.__class__.__name__))
+                print "Download: %s" % sha256
+                break
 
 if __name__ == "__main__":
     global plugins
@@ -120,4 +132,5 @@ if __name__ == "__main__":
         if (sha256 and sha1 and md5):
             process(sha256, sha1, md5)
     
+    print "Fertich"
     

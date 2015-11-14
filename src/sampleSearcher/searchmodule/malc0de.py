@@ -5,15 +5,12 @@ __date__ = '2015/11/13'
 
 class Malc0de():
 
-    downloadURLs = []
+    def __init__(self):
+        self.downloadURLs = []
     
-    # Benoetigt ein Triple: [sha256,sha1,md5]
     def searchSample(self, sha256, sha1, md5):
-        print "Malc0de search for Sample: %s; %s; %s" % (sha256,sha1,md5)
-        #self.downloadURLs.append("xz.q58723.com/xz/setup_962_1565.exe")
-        #self.downloadURLs.append("xz.q58723.com/xz/setup_962_1565.exe")
-        #self.downloadURLs.append("xz.q58723.com/xz/setup_962_10043.exe")
-        return True
+        #print "Malc0de search for Sample: %s" % sha256
+        return False
         
     def isDownloadable(self):
         if self.downloadURLs:
