@@ -17,7 +17,7 @@ class Malc0de():
             return True
         return False
         
-    def downloadSample(self, path):
+    def downloadSample(self, path, filename):
         if not self.downloadURLs:
             raise Exception("Keine Download-URL vorhanden!") 
         

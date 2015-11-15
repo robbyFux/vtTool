@@ -3,18 +3,23 @@ import sys
 import time
 import logging
 
-logging.captureWarnings(True)
-PLUGIN_DIR = 'searchmodule'
-SAMPLES_DIR = 'samples'
-LOGFILE = 'logfile.log'
-LOG_DOWNLOAD = "DOWNLOAD\t%s\t%s"
-LOG_DOWNLOAD_URL = "URL\t%s\t%s"
-
 try:
     import requests
 except ImportError:
     sys.stderr.write('Requests ist erforderlich: http://docs.python-requests.org oder sudo pip install requests')
     sys.exit() 
+    
+logging.captureWarnings(True)
+
+PLUGIN_DIR = 'searchmodule'
+SAMPLES_DIR = 'samples'
+LOGFILE = 'logfile.log'
+LOG_VIRUSTOTAL = "VIRUSTOTAL\t%s\t%s"
+LOG_DOWNLOAD = "DOWNLOAD\t%s\t%s"
+LOG_DOWNLOAD_URL = "URL\t%s\t%s"
+
+TIME_OUT = 240
+USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0'
 
 VIRUSTOTAL_URL = 'https://www.virustotal.com/vtapi/v2/file/report'
 VIRUSTOTAL_URL_SUBMIT = 'https://www.virustotal.com/vtapi/v2/file/scan'
@@ -91,16 +96,19 @@ def loadPlugins():
             print('Error %s loading plugin: %s' % (e, plugin.replace('.py', '')))
             
 def process(sha256, sha1, md5):   
+    if not os.path.exists(SAMPLES_DIR):
+        os.makedirs(SAMPLES_DIR) 
+    
     for pluginClass in plugins:
         pluginObj = pluginClass()
         pluginObj.searchSample(sha256, sha1, md5)
         
         if pluginObj.isDownloadable():
-            if pluginObj.downloadSample(SAMPLES_DIR):
+            if pluginObj.downloadSample(SAMPLES_DIR, sha256 + ".bin"):
                 log(LOG_DOWNLOAD % (sha256, pluginObj.__class__.__name__))
                 print "Download: %s" % sha256
                 break
-
+            
 if __name__ == "__main__":
     global plugins
     plugins = []
@@ -131,6 +139,10 @@ if __name__ == "__main__":
         sha256,sha1,md5 = processHashVT(malware_hash)
         if (sha256 and sha1 and md5):
             process(sha256, sha1, md5)
+        else:
+            # Hash bei VirusTotal nicht gefunden
+            log(LOG_VIRUSTOTAL % (malware_hash, "Hash nicht gefunden"))
+            # Download mit Hash versuchen 
+            process(malware_hash, malware_hash, malware_hash)
     
     print "Fertich"
-    
