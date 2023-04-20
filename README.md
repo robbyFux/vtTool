@@ -5,5 +5,5 @@ VT-Tool offers a convenient way of determining the likely name of malware by que
 
 https://github.com/robbyFux/Tools/blob/master/doc/vtTool.md
 
-![vtTool](https://raw.githubusercontent.com/robbyFux/Tools/master/doc/vtTool.png)
+![vtTool](https://github.com/robbyFux/vtTool/blob/master/doc/vtTool.png)
 
